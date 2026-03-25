@@ -33,7 +33,6 @@ export class LessonService {
         });
         if (!section) throw new NotFoundException('Section not found');
 
-        // Sotib olganmi yoki mentormi tekshiramiz
         const purchased = await this.prisma.purchasedCourse.findFirst({
             where: { courseId: section.courseId, userId, status: Status.active },
         });
@@ -66,7 +65,6 @@ export class LessonService {
         });
         if (!lesson) throw new NotFoundException('Lesson not found');
 
-        // Sotib olganmi yoki mentormi tekshiramiz
         const purchased = await this.prisma.purchasedCourse.findFirst({
             where: { courseId: lesson.section.courseId, userId, status: Status.active },
         });
@@ -75,6 +73,12 @@ export class LessonService {
         if (!purchased && !isMentor) {
             throw new ForbiddenException('You have not purchased this course');
         }
+
+        await this.prisma.lessonView.upsert({
+            where: { lessonId_userId: { lessonId: id, userId } },
+            update: { view: true },
+            create: { lessonId: id, userId, view: true },
+        });
 
         return { success: true, data: lesson };
     }

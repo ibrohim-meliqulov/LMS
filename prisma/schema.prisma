@@ -237,7 +237,7 @@ model Lesson {
 model LessonView {
   lessonId Int
   userId   Int
-  view     Boolean
+  view     Boolean @default(false)
   status   Status  @default(active)
 
   lesson Lesson @relation(fields: [lessonId], references: [id])
