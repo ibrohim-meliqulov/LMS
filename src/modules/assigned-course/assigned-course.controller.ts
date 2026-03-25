@@ -14,45 +14,38 @@ import { CreateAssignedCourseDto } from './dto/create.assigned-course.dto';
 export class AssignedCourseController {
     constructor(private assignedCourseService: AssignedCourseService) { }
 
-    @Post()
-    @Roles(UserRole.ASSISTANT, UserRole.ADMIN, UserRole.STUDENT)
-    create(@Body() payload: CreateAssignedCourseDto,
-        @Req() req: any) {
-        return this.assignedCourseService.create(req['user'], payload)
+    @Post('assign')
+    @Roles(UserRole.ADMIN)
+    assign(@Body() dto: CreateAssignedCourseDto) {
+        return this.assignedCourseService.assign(dto);
     }
 
-
-
-
-    @Get('user/:userId')
-    @Roles(UserRole.ADMIN, UserRole.ASSISTANT, UserRole.STUDENT)
-    findByUser(@Param('userId', ParseIntPipe) userId: number) {
-        return this.assignedCourseService.findByUser(userId);
-    }
-
-    @Get("MyAssigned")
-    @Roles(UserRole.ADMIN, UserRole.STUDENT)
-    findMyAssignedCourse(
-        @Req() req: Request
+    @Delete('unassign/:userId/:courseId')
+    @Roles(UserRole.ADMIN)
+    unassign(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Param('courseId', ParseIntPipe) courseId: number,
     ) {
-        return this.assignedCourseService.findMyAssignedCourse(req['user']);
+        return this.assignedCourseService.unassign(userId, courseId);
     }
 
 
     @Get()
-    @Roles(UserRole.ADMIN, UserRole.STUDENT)
+    @Roles(UserRole.ADMIN)
     findAll() {
         return this.assignedCourseService.findAll();
     }
 
+    @Get('user/:userId')
+    @Roles(UserRole.ADMIN)
+    findByUser(@Param('userId', ParseIntPipe) userId: number) {
+        return this.assignedCourseService.findByUser(userId);
+    }
 
 
-    @Delete(':userId/:courseId')
-    @Roles(UserRole.ADMIN, UserRole.STUDENT)
-    remove(
-        @Param('userId', ParseIntPipe) userId: number,
-        @Param('courseId', ParseIntPipe) courseId: number,
-    ) {
-        return this.assignedCourseService.remove(userId, courseId);
+    @Get('my')
+    @Roles(UserRole.ASSISTANT)
+    findMy(@Req() req: any) {
+        return this.assignedCourseService.findMy(req['user'].id);
     }
 }
