@@ -41,7 +41,17 @@ import { join } from 'path';
         rootPath: join(process.cwd(), 'src', 'uploads', 'videos'),
         serveRoot: '/videos',
         serveStaticOptions: { index: false }
-      }
+      },
+      {
+        rootPath: join(process.cwd(), 'src', 'uploads', 'homeworks'),
+        serveRoot: '/homeworks',
+        serveStaticOptions: { index: false }
+      },
+      {
+        rootPath: join(process.cwd(), "src", "uploads", "lesson-file"),
+        serveRoot: '/lesson-file',
+        serveStaticOptions: { index: false }
+      },
     )
     ,
     ConfigModule.forRoot({

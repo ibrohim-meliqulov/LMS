@@ -69,14 +69,8 @@ export class LessonFileController {
     }
 
     @Delete(':id')
-    @Roles(UserRole.MENTOR)
+    @Roles(UserRole.MENTOR, UserRole.ADMIN)
     remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-        return this.lessonFileService.remove(id, req['user'].id);
-    }
-
-    @Delete('admin/:id')
-    @Roles(UserRole.ADMIN)
-    adminRemove(@Param('id', ParseIntPipe) id: number) {
-        return this.lessonFileService.adminRemove(id);
+        return this.lessonFileService.remove(id, req['user'].id, req['user'].role);
     }
 }
