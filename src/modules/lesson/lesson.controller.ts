@@ -45,7 +45,7 @@ export class LessonController {
     ) {
         return this.lessonService.update(id, dto, req['user'].id);
     }
-
+    TODO: {}
     @Delete(':id')
     @Roles(UserRole.MENTOR)
     remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
