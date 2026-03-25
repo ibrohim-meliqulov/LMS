@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/core/database/prisma.service';
-import { Status } from '@prisma/client';
+import { Status, UserRole } from '@prisma/client';
 import { CreateLessonFileDto } from './dto/create-lesson-file.dto';
 
 @Injectable()
@@ -58,7 +58,7 @@ export class LessonFileService {
         return { success: true, data };
     }
 
-    async remove(id: number, mentorId: number) {
+    async remove(id: number, userId: number, role: UserRole) {
         const lessonFile = await this.prisma.lessonFile.findUnique({
             where: { id },
             include: { lesson: { include: { section: { include: { course: true } } } } },
@@ -67,22 +67,10 @@ export class LessonFileService {
             throw new NotFoundException('Lesson file not found');
         }
 
-        if (lessonFile.lesson.section.course.mentorId !== mentorId) {
-            throw new ForbiddenException('This is not your course');
-        }
-
-        await this.prisma.lessonFile.update({
-            where: { id },
-            data: { status: Status.inactive },
-        });
-
-        return { success: true, message: 'Lesson file removed successfully' };
-    }
-
-    async adminRemove(id: number) {
-        const lessonFile = await this.prisma.lessonFile.findUnique({ where: { id } });
-        if (!lessonFile || lessonFile.status === Status.inactive) {
-            throw new NotFoundException('Lesson file not found');
+        if (role !== UserRole.ADMIN) {
+            if (lessonFile.lesson.section.course.mentorId !== userId) {
+                throw new ForbiddenException('This is not your course');
+            }
         }
 
         await this.prisma.lessonFile.update({
