@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
-import { LessonController } from './lesson.controller';
+import { AuthModule } from '../auth/auth.module';
 import { LessonService } from './lesson.service';
+import { LessonController } from './lesson.controller';
+import { PrismaService } from 'src/core/database/prisma.service';
 
 @Module({
+  imports: [AuthModule],
   controllers: [LessonController],
-  providers: [LessonService]
+  providers: [LessonService, PrismaService],
 })
-export class LessonModule {}
+export class LessonModule { }
