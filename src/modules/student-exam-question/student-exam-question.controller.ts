@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { AuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RoleGuard } from 'src/common/guards/role.guard';
@@ -15,6 +15,7 @@ export class StudentExamQuestionController {
 
     @Get('exam/:examId')
     @Roles(UserRole.MENTOR, UserRole.ADMIN)
+    @ApiOperation({ summary: "MENTOR, ADMIN" })
     findByExam(@Param('examId', ParseIntPipe) examId: number, @Req() req: any) {
         return this.studentExamQuestionService.findByExam(examId, req['user'].id, req['user'].role);
     }

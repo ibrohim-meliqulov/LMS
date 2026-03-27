@@ -6,7 +6,7 @@ import {
     Req
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { diskStorage } from 'multer';
 import { RoleGuard } from 'src/common/guards/role.guard';
@@ -107,6 +107,7 @@ export class UserController {
     @Get()
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     findAll() {
         return this.userService.findAll();
     }
@@ -116,6 +117,7 @@ export class UserController {
     @Get(':id')
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.userService.findOne(id);
     }
@@ -124,6 +126,7 @@ export class UserController {
     @Put(':id/role')
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     updateRole(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateRoleDto,
@@ -166,6 +169,7 @@ export class UserController {
             cb(null, true)
         }
     }))
+    @ApiOperation({ summary: "ADMIN, ASSISTANT, MENTOR, STUDENT" })
     update(
         @Req() req: any,
         @Body() dto: UpdateUserDto,
@@ -178,6 +182,7 @@ export class UserController {
     @Delete(':id')
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(UserRole.ADMIN, UserRole.STUDENT)
+    @ApiOperation({ summary: "ADMIN, STUDENT" })
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.userService.remove(id);
     }

@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { AuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RoleGuard } from 'src/common/guards/role.guard';
@@ -15,12 +15,14 @@ export class LessonViewController {
 
     @Get('my')
     @Roles(UserRole.STUDENT, UserRole.MENTOR)
+    @ApiOperation({ summary: "STUDENT, MENTOR" })
     findMy(@Req() req: any) {
         return this.lessonViewService.findMy(req['user'].id);
     }
 
     @Get('lesson/:lessonId')
     @Roles(UserRole.ADMIN, UserRole.ASSISTANT)
+    @ApiOperation({ summary: "ADMIN, ASSISTANT" })
     findByLesson(@Param('lessonId', ParseIntPipe) lessonId: number) {
         return this.lessonViewService.findByLesson(lessonId);
     }

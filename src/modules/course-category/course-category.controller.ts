@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { RoleGuard } from 'src/common/guards/role.guard';
 import { CourseCategoryService } from './course-category.service';
@@ -16,30 +16,35 @@ export class CourseCategoryController {
 
     @Post()
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     create(@Body() dto: CreateCourseCategoryDto) {
         return this.courseCategoryService.create(dto);
     }
 
     @Get()
     @Roles(UserRole.ADMIN, UserRole.MENTOR, UserRole.ASSISTANT, UserRole.STUDENT)
+    @ApiOperation({ summary: "ADMIN, MENTOR, ASSISTANT, STUDENT" })
     findAll() {
         return this.courseCategoryService.findAll();
     }
 
     @Get(':id')
     @Roles(UserRole.ADMIN, UserRole.MENTOR, UserRole.ASSISTANT, UserRole.STUDENT)
+    @ApiOperation({ summary: "ADMIN, MENTOR, ASSISTANT, STUDENT" })
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.courseCategoryService.findOne(id);
     }
 
     @Put(':id')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     update(@Param('id', ParseIntPipe) id: number, @Body() payload: UpdateCourseCategoryDto) {
         return this.courseCategoryService.update(id, payload);
     }
 
     @Delete(':id')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.courseCategoryService.remove(id);
     }

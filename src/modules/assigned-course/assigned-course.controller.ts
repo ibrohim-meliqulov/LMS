@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { AuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RoleGuard } from 'src/common/guards/role.guard';
@@ -16,12 +16,14 @@ export class AssignedCourseController {
 
     @Post('assign')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     assign(@Body() dto: CreateAssignedCourseDto) {
         return this.assignedCourseService.assign(dto);
     }
 
     @Delete('unassign')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     unassign(
         @Query('userId', ParseIntPipe) userId: number,
         @Query('courseId', ParseIntPipe) courseId: number,
@@ -32,12 +34,14 @@ export class AssignedCourseController {
 
     @Get()
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     findAll() {
         return this.assignedCourseService.findAll();
     }
 
     @Get('user/:userId')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     findByUser(@Param('userId', ParseIntPipe) userId: number) {
         return this.assignedCourseService.findByUser(userId);
     }
@@ -45,6 +49,7 @@ export class AssignedCourseController {
 
     @Get('my')
     @Roles(UserRole.ASSISTANT)
+    @ApiOperation({ summary: "ASSISTANT" })
     findMy(@Req() req: any) {
         return this.assignedCourseService.findMy(req['user'].id);
     }

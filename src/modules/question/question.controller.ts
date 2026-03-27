@@ -2,7 +2,7 @@ import {
     Body, Controller, Get, Param, ParseIntPipe, Patch,
     Post, Req, UploadedFile, UseGuards, UseInterceptors, UnsupportedMediaTypeException
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -51,6 +51,7 @@ export class QuestionController {
             }
         },
     }))
+    @ApiOperation({ summary: "STUDENT" })
     create(
         @Body() dto: CreateQuestionDto,
         @UploadedFile() file: Express.Multer.File,
@@ -61,6 +62,7 @@ export class QuestionController {
 
     @Get('course/:courseId')
     @Roles(UserRole.MENTOR, UserRole.ADMIN, UserRole.ASSISTANT, UserRole.STUDENT)
+    @ApiOperation({ summary: "MENTOR, ADMIN, ASSISTANT, STUDENT" })
     findByCourse(
         @Param('courseId', ParseIntPipe) courseId: number,
         @Req() req: any,
@@ -70,6 +72,7 @@ export class QuestionController {
 
     @Patch(':id/read')
     @Roles(UserRole.MENTOR, UserRole.ADMIN, UserRole.ASSISTANT)
+    @ApiOperation({ summary: "MENTOR, ADMIN, ASSISTANT" })
     markAsRead(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
         return this.questionService.markAsRead(id, req['user'].id, req['user'].role);
     }

@@ -2,7 +2,7 @@ import {
     Body, Controller, Delete, Get, Param, ParseIntPipe,
     Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors, UnsupportedMediaTypeException
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -54,6 +54,7 @@ export class HomeworkController {
         },
     })
     @UseInterceptors(fileInterceptor())
+    @ApiOperation({ summary: "MENTOR, ADMIN" })
     create(
         @Body() dto: CreateHomeworkDto,
         @UploadedFile() file: Express.Multer.File,
@@ -64,6 +65,7 @@ export class HomeworkController {
 
     @Get('lesson/:lessonId')
     @Roles(UserRole.ADMIN, UserRole.ASSISTANT, UserRole.STUDENT, UserRole.MENTOR)
+    @ApiOperation({ summary: "ADMIN, ASSISTANT, STUDENT, MENTOR" })
     findByLesson(
         @Param('lessonId', ParseIntPipe) lessonId: number,
         @Req() req: any,
@@ -84,6 +86,7 @@ export class HomeworkController {
         },
     })
     @UseInterceptors(fileInterceptor())
+    @ApiOperation({ summary: "MENTOR" })
     update(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateHomeworkDto,
@@ -95,6 +98,7 @@ export class HomeworkController {
 
     @Delete(':id')
     @Roles(UserRole.MENTOR, UserRole.ADMIN)
+    @ApiOperation({ summary: "MENTOR, ADMIN" })
     remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
         return this.homeworkService.remove(id, req['user'].id, req['user'].role);
     }
