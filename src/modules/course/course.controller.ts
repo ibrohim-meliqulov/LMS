@@ -1,7 +1,9 @@
 import {
     Body, Controller, Delete, Get, Param, Post, Put,
     Req, UploadedFiles, UseGuards, UseInterceptors, UnsupportedMediaTypeException,
-    BadRequestException
+    BadRequestException,
+    ParseIntPipe,
+    Patch
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -56,7 +58,7 @@ export class CourseController {
     constructor(private courseService: CourseService) { }
 
     @Post()
-    @Roles(UserRole.MENTOR, UserRole.ADMIN)
+    @Roles(UserRole.MENTOR)
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {
@@ -102,9 +104,15 @@ export class CourseController {
         return this.courseService.findMyCoures(req['user'].id);
     }
 
+    @Get('unpublished')
+    @Roles(UserRole.ADMIN)
+    findUnpublished() {
+        return this.courseService.findUnpublished();
+    }
+
     @Get(':id')
     @Roles(UserRole.ADMIN, UserRole.MENTOR, UserRole.ASSISTANT, UserRole.STUDENT)
-    findOne(@Param('id') id: number) {
+    findOne(@Param('id', ParseIntPipe) id: number) {
         return this.courseService.findOne(id);
     }
 
@@ -128,7 +136,7 @@ export class CourseController {
     })
     @UseInterceptors(fileFields)
     update(
-        @Param('id') id: number,
+        @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateCourseDto,
         @UploadedFiles() files: { banner?: Express.Multer.File[], introVideo?: Express.Multer.File[] },
         @Req() req: any,
@@ -143,9 +151,17 @@ export class CourseController {
         );
     }
 
-    @Delete(':id')
-    @Roles(UserRole.ADMIN, UserRole.MENTOR)
-    remove(@Param('id') id: number, @Req() req: any) {
-        return this.courseService.remove(id, req['user'].id, req['user'].role);
+
+    @Patch(':id/toggle-publish')
+    @Roles(UserRole.ADMIN)
+    togglePublish(@Param('id', ParseIntPipe) id: number) {
+        return this.courseService.togglePublish(id);
     }
+
+    @Delete(':id')
+    @Roles(UserRole.ADMIN)
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.courseService.remove(id);
+    }
+
 }

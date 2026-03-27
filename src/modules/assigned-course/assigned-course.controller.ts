@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { AuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -20,11 +20,11 @@ export class AssignedCourseController {
         return this.assignedCourseService.assign(dto);
     }
 
-    @Delete('unassign/:userId/:courseId')
+    @Delete('unassign')
     @Roles(UserRole.ADMIN)
     unassign(
-        @Param('userId', ParseIntPipe) userId: number,
-        @Param('courseId', ParseIntPipe) courseId: number,
+        @Query('userId', ParseIntPipe) userId: number,
+        @Query('courseId', ParseIntPipe) courseId: number,
     ) {
         return this.assignedCourseService.unassign(userId, courseId);
     }

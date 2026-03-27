@@ -41,6 +41,7 @@ export class AssignedCourseService {
         const exists = await this.prisma.assignedCourse.findUnique({
             where: { userId_courseId: { userId, courseId } },
         });
+
         if (!exists || exists.status === Status.inactive) {
             throw new NotFoundException('Assigned course not found');
         }
@@ -57,9 +58,9 @@ export class AssignedCourseService {
         const data = await this.prisma.assignedCourse.findMany({
             where: { status: Status.active },
             select: {
-                createdAt: true,
-                user: { select: { id: true, fullName: true, phone: true, image: true } },
                 course: { select: { id: true, name: true, level: true, banner: true } },
+                user: { select: { id: true, fullName: true, phone: true, image: true } },
+                createdAt: true,
             },
         });
 

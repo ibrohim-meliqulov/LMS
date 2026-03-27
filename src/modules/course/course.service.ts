@@ -19,6 +19,7 @@ export class CourseService {
                 banner,
                 introVideo: introVideo ?? null,
                 mentorId: userId,
+                price: Number(payload.price)
             },
         });
         return { success: true, message: 'Course created successfully' };
@@ -88,7 +89,7 @@ export class CourseService {
             success: true,
             data: {
                 ...course,
-                price: course.price,
+                price: Number(course.price),
                 banner: `http://localhost:3000/banners/${course.banner}`,
                 introVideo: course.introVideo ? `http://localhost:3000/videos/${course.introVideo}` : null,
                 mentor: {
@@ -120,15 +121,16 @@ export class CourseService {
         return { success: true, message: 'Course updated successfully' };
     }
 
-    async remove(id: number, userId: number, userRole: UserRole) {
-        const course = await this.prisma.course.findUnique({ where: { id, status: Status.active } });
+    async remove(id: number) {
+        const course = await this.prisma.course.findUnique({
+            where: { id, status: Status.active }
+        });
         if (!course) throw new NotFoundException('Course not found');
 
-        if (userRole !== UserRole.ADMIN && course.mentorId !== userId) {
-            throw new ForbiddenException('You can only delete your own courses');
-        }
-
-        await this.prisma.course.update({ where: { id }, data: { status: Status.inactive } });
+        await this.prisma.course.update({
+            where: { id },
+            data: { status: Status.inactive }
+        });
         return { success: true, message: 'Course deleted successfully' };
     }
 
@@ -154,6 +156,58 @@ export class CourseService {
             success: true,
             data: myCourse
         }
+    }
+
+
+
+    async findUnpublished() {
+        const courses = await this.prisma.course.findMany({
+            where: { published: false, status: Status.active },
+            select: {
+                id: true,
+                name: true,
+                about: true,
+                price: true,
+                banner: true,
+                introVideo: true,
+                level: true,
+                published: true,
+                createdAt: true,
+                category: { select: { id: true, name: true } },
+                mentor: { select: { id: true, fullName: true, image: true } },
+            },
+        });
+
+        const result = courses.map(course => ({
+            ...course,
+            price: Number(course.price),
+            banner: `http://localhost:3000/banners/${course.banner}`,
+            introVideo: course.introVideo ? `http://localhost:3000/videos/${course.introVideo}` : null,
+            mentor: {
+                ...course.mentor,
+                image: course.mentor.image ? `http://localhost:3000/images/${course.mentor.image}` : null,
+            }
+        }));
+
+        return { success: true, data: result };
+    }
+
+
+    async togglePublish(id: number) {
+        const course = await this.prisma.course.findUnique({
+            where: { id, status: Status.active }
+        });
+        if (!course) throw new NotFoundException('Course not found');
+
+        await this.prisma.course.update({
+            where: { id },
+            data: { published: !course.published },
+        });
+
+        return {
+            success: true,
+            message: `Course ${!course.published ? 'published' : 'unpublished'} successfully`
+        };
     }
 
 

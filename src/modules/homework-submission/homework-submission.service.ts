@@ -1,12 +1,12 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/core/database/prisma.service';
-import { UserRole } from '@prisma/client';
+import { Status, UserRole } from '@prisma/client';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { UpdateSubmissionStatusDto } from './dto/update-status.dto';
 
 @Injectable()
 export class HomeworkSubmissionService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) { }
 
     async create(dto: CreateSubmissionDto, file: string, userId: number) {
         const homework = await this.prisma.homework.findUnique({
@@ -77,8 +77,20 @@ export class HomeworkSubmissionService {
         if (!submission) throw new NotFoundException('Submission not found');
 
         const course = submission.homework.lesson.section.course;
-        if (role !== UserRole.ADMIN && course.mentorId !== userId) {
-            throw new ForbiddenException('This is not your course');
+
+        if (role === UserRole.ADMIN) {
+        } else if (role === UserRole.MENTOR) {
+            if (course.mentorId !== userId) {
+                throw new ForbiddenException('This is not your course');
+            }
+        } else if (role === UserRole.ASSISTANT) {
+            const assigned = await this.prisma.assignedCourse.findUnique({
+                where: {
+                    userId_courseId: { userId, courseId: course.id },
+                    status: Status.active,
+                },
+            });
+            if (!assigned) throw new ForbiddenException('This course is not assigned to you');
         }
 
         const updated = await this.prisma.homeworkSubmission.update({

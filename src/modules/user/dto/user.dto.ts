@@ -25,7 +25,7 @@ export class CreateTeacherDto {
     @IsMobilePhone("uz-UZ")
     phone: string;
 
-    @ApiProperty({ example: 'secret123' })
+    @ApiProperty({ example: 'Ibrohim1234!' })
     @IsString()
     @MinLength(6)
     password: string;
