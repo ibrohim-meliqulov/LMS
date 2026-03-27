@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { RoleGuard } from 'src/common/guards/role.guard';
 import { MentorProfileService } from './mentor-profile.service';
@@ -18,6 +18,7 @@ export class MentorProfileController {
 
     @Post(':userId')
     @Roles(UserRole.MENTOR)
+    @ApiOperation({ summary: "MENTOR" })
     create(
         @Body() payload: CreateMentorProfileDto,
         @Req() req: Request
@@ -27,30 +28,35 @@ export class MentorProfileController {
 
     @Get()
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     findAll() {
         return this.mentorProfileService.findAll();
     }
 
     @Get('me')
     @Roles(UserRole.MENTOR)
+    @ApiOperation({ summary: "MENTOR" })
     findMyProfile(@Req() req: any) {
         return this.mentorProfileService.findMyProfile(req['user']);
     }
 
     @Get(':id')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.mentorProfileService.findOne(id);
     }
 
     @Put()
     @Roles(UserRole.MENTOR)
+    @ApiOperation({ summary: "MENTOR" })
     update(@Req() req: any, @Body() payload: UpdateMentorProfileDto) {
         return this.mentorProfileService.update(req['user'], payload);
     }
 
     @Delete(':id')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.mentorProfileService.remove(id);
     }

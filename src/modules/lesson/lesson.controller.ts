@@ -4,7 +4,7 @@ import {
     BadRequestException
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiBody, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiBody, ApiBearerAuth, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { UserRole } from '@prisma/client';
 import { AuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -53,6 +53,7 @@ export class LessonController {
             cb(null, true);
         },
     }))
+    @ApiOperation({ summary: "MENTOR, ADMIN" })
     create(
         @Body() dto: CreateLessonDto,
         @UploadedFile() video: Express.Multer.File,
@@ -106,6 +107,7 @@ export class LessonController {
             cb(null, true);
         },
     }))
+    @ApiOperation({ summary: "MENTOR, ADMIN" })
     update(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateLessonDto,
@@ -117,12 +119,14 @@ export class LessonController {
 
     @Delete(':id')
     @Roles(UserRole.MENTOR)
+    @ApiOperation({ summary: "MENTOR" })
     remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
         return this.lessonService.remove(id, req['user'].id);
     }
 
     @Delete('admin/:id')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     adminRemove(@Param('id', ParseIntPipe) id: number) {
         return this.lessonService.adminRemove(id);
     }

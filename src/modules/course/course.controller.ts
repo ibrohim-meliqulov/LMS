@@ -6,7 +6,7 @@ import {
     Patch
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { diskStorage } from 'multer';
 import { RoleGuard } from 'src/common/guards/role.guard';
@@ -58,7 +58,7 @@ export class CourseController {
     constructor(private courseService: CourseService) { }
 
     @Post()
-    @Roles(UserRole.MENTOR)
+    @Roles(UserRole.MENTOR, UserRole.ADMIN)
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {
@@ -76,6 +76,7 @@ export class CourseController {
         },
     })
     @UseInterceptors(fileFields)
+    @ApiOperation({ summary: "MENTOR, ADMIN" })
     create(
         @Body() payload: CreateCourseDto,
         @UploadedFiles() files: { banner?: Express.Multer.File[], introVideo?: Express.Multer.File[] },
@@ -93,12 +94,14 @@ export class CourseController {
 
     @Get()
     @Roles(UserRole.ADMIN, UserRole.MENTOR, UserRole.ASSISTANT, UserRole.STUDENT)
+    @ApiOperation({ summary: "ADMIN, MENTOR, ASSISTANT, STUDENT" })
     findAll() {
         return this.courseService.findAll();
     }
 
     @Get('my')
     @Roles(UserRole.MENTOR)
+    @ApiOperation({ summary: "MENTOR" })
     findMyCourses(@Req() req: any) {
         console.log('User from token:', req['user']);
         return this.courseService.findMyCoures(req['user'].id);
@@ -106,12 +109,14 @@ export class CourseController {
 
     @Get('unpublished')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     findUnpublished() {
         return this.courseService.findUnpublished();
     }
 
     @Get(':id')
     @Roles(UserRole.ADMIN, UserRole.MENTOR, UserRole.ASSISTANT, UserRole.STUDENT)
+    @ApiOperation({ summary: "ADMIN, MENTOR, ASSISTANT, STUDENT" })
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.courseService.findOne(id);
     }
@@ -135,6 +140,7 @@ export class CourseController {
         },
     })
     @UseInterceptors(fileFields)
+    @ApiOperation({ summary: "ADMIN, MENTOR" })
     update(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateCourseDto,
@@ -154,12 +160,14 @@ export class CourseController {
 
     @Patch(':id/toggle-publish')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     togglePublish(@Param('id', ParseIntPipe) id: number) {
         return this.courseService.togglePublish(id);
     }
 
     @Delete(':id')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.courseService.remove(id);
     }

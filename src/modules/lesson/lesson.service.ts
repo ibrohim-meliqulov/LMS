@@ -45,7 +45,14 @@ export class LessonService {
                     status: Status.active,
                 },
             });
-            if (!purchased) throw new ForbiddenException('You have not purchased this course');
+            const assigned = await this.prisma.assignedCourse.findFirst({
+                where: {
+                    userId,
+                    courseId: section.courseId,
+                    status: Status.active,
+                },
+            });
+            if (!purchased && !assigned) throw new ForbiddenException('You have not purchased this course');
         }
 
         const lessons = await this.prisma.lesson.findMany({
@@ -88,7 +95,14 @@ export class LessonService {
                     status: Status.active,
                 },
             });
-            if (!purchased) throw new ForbiddenException('You have not purchased this course');
+            const assigned = await this.prisma.assignedCourse.findFirst({
+                where: {
+                    userId,
+                    courseId: lesson.section.courseId,
+                    status: Status.active,
+                },
+            });
+            if (!purchased && !assigned) throw new ForbiddenException('You have not purchased this course');
 
             await this.prisma.lessonView.upsert({
                 where: { lessonId_userId: { lessonId: id, userId } },

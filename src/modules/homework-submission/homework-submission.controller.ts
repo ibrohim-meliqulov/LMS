@@ -2,7 +2,7 @@ import {
     Body, Controller, Get, Param, ParseIntPipe, Patch,
     Post, Req, UploadedFile, UseGuards, UseInterceptors, UnsupportedMediaTypeException
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -53,6 +53,7 @@ export class HomeworkSubmissionController {
             }
         },
     }))
+    @ApiOperation({ summary: "STUDENT" })
     create(
         @Body() dto: CreateSubmissionDto,
         @UploadedFile() file: Express.Multer.File,
@@ -63,6 +64,7 @@ export class HomeworkSubmissionController {
 
     @Get('homework/:homeworkId')
     @Roles(UserRole.MENTOR, UserRole.ADMIN, UserRole.ASSISTANT)
+    @ApiOperation({ summary: "MENTOR, ADMIN, ASSISTANT" })
     findByHomework(
         @Param('homeworkId', ParseIntPipe) homeworkId: number,
         @Req() req: any,
@@ -72,12 +74,14 @@ export class HomeworkSubmissionController {
 
     @Get('my')
     @Roles(UserRole.STUDENT)
+    @ApiOperation({ summary: "STUDENT" })
     findMySubmissions(@Req() req: any) {
         return this.submissionService.findMySubmissions(req['user'].id);
     }
 
     @Patch(':id/status')
     @Roles(UserRole.MENTOR, UserRole.ASSISTANT, UserRole.ADMIN)
+    @ApiOperation({ summary: "MENTOR, ASSISTANT, ADMIN" })
     updateStatus(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateSubmissionStatusDto,

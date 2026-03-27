@@ -1,7 +1,7 @@
 import {
     Body, Controller, Post, Req, UploadedFile, UseGuards, UseInterceptors, UnsupportedMediaTypeException
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -50,6 +50,7 @@ export class QuestionAnswerController {
             }
         },
     }))
+    @ApiOperation({ summary: "MENTOR, ADMIN" })
     create(
         @Body() dto: CreateAnswerDto,
         @UploadedFile() file: Express.Multer.File,

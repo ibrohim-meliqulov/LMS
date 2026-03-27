@@ -14,10 +14,6 @@ export class SectionLessonService {
         });
         if (!course) throw new NotFoundException('Course not found');
 
-        // Faqat o'z kursiga section qo'sha oladi
-        if (course.mentorId !== mentorId) {
-            throw new ForbiddenException('This is not your course');
-        }
 
         const section = await this.prisma.sectionLesson.create({
             data: dto,
@@ -26,11 +22,25 @@ export class SectionLessonService {
         return { success: true, data: section };
     }
 
-    async findByCourse(courseId: number) {
+    async findByCourse(courseId: number, user: any) {
         const course = await this.prisma.course.findUnique({
             where: { id: courseId },
         });
         if (!course) throw new NotFoundException('Course not found');
+
+        if (user.role === 'STUDENT') {
+            const hasPurchased = await this.prisma.purchasedCourse.findFirst({
+                where: { userId: user.id, courseId, status: Status.active },
+            });
+            const hasAssigned = await this.prisma.assignedCourse.findFirst({
+                where: { userId: user.id, courseId, status: Status.active },
+            });
+
+            if (!hasPurchased && !hasAssigned) {
+                throw new ForbiddenException('You have not purchased this course');
+            }
+        }
+
 
         const sections = await this.prisma.sectionLesson.findMany({
             where: { courseId, status: Status.active },

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { AuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RoleGuard } from 'src/common/guards/role.guard';
@@ -16,18 +16,21 @@ export class ExamResultController {
 
     @Post('submit')
     @Roles(UserRole.STUDENT)
+    @ApiOperation({ summary: "STUDENT" })
     submit(@Body() dto: SubmitExamDto, @Req() req: any) {
         return this.examResultService.submitExam(dto, req['user'].id);
     }
 
     @Get('section/:sectionId/my')
     @Roles(UserRole.STUDENT)
+    @ApiOperation({ summary: "STUDENT" })
     findMyResult(@Param('sectionId', ParseIntPipe) sectionId: number, @Req() req: any) {
         return this.examResultService.findUserResult(sectionId, req['user'].id);
     }
 
     @Get('section/:sectionId/student/:userId')
     @Roles(UserRole.MENTOR, UserRole.ADMIN, UserRole.ASSISTANT)
+    @ApiOperation({ summary: "MENTOR, ADMIN, ASSISTANT" })
     findStudentResult(
         @Param('sectionId', ParseIntPipe) sectionId: number,
         @Param('userId', ParseIntPipe) userId: number,

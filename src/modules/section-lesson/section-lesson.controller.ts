@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags , ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { AuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RoleGuard } from 'src/common/guards/role.guard';
@@ -17,18 +17,21 @@ export class SectionLessonController {
 
     @Post()
     @Roles(UserRole.MENTOR, UserRole.ADMIN)
+    @ApiOperation({ summary: "MENTOR, ADMIN" })
     create(@Body() dto: CreateSectionLessonDto, @Req() req: any) {
         return this.sectionLessonService.create(dto, req['user'].id);
     }
 
     @Get('course/:courseId')
     @Roles(UserRole.ADMIN, UserRole.ASSISTANT, UserRole.STUDENT, UserRole.MENTOR)
-    findByCourse(@Param('courseId', ParseIntPipe) courseId: number) {
-        return this.sectionLessonService.findByCourse(courseId);
+    @ApiOperation({ summary: "ADMIN, ASSISTANT, STUDENT, MENTOR" })
+    findByCourse(@Param('courseId', ParseIntPipe) courseId: number, @Req() req: any) {
+        return this.sectionLessonService.findByCourse(courseId, req['user']);
     }
 
     @Patch(':id')
     @Roles(UserRole.MENTOR, UserRole.ADMIN)
+    @ApiOperation({ summary: "MENTOR, ADMIN" })
     update(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateSectionLessonDto,
@@ -39,12 +42,14 @@ export class SectionLessonController {
 
     @Delete(':id')
     @Roles(UserRole.MENTOR)
+    @ApiOperation({ summary: "MENTOR" })
     remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
         return this.sectionLessonService.remove(id, req['user'].id);
     }
 
     @Delete('admin/:id')
     @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: "ADMIN" })
     adminRemove(@Param('id', ParseIntPipe) id: number) {
         return this.sectionLessonService.adminRemove(id);
     }
