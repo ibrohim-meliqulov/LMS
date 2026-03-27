@@ -82,6 +82,7 @@ export class PurchasedCourseService {
         const user = await this.prisma.user.findUnique({ where: { id: userId } });
         if (!user) throw new NotFoundException('User not found');
 
+
         const data = await this.prisma.purchasedCourse.findMany({
             where: { userId, status: Status.active },
             select: {
@@ -101,6 +102,7 @@ export class PurchasedCourseService {
                 },
             },
         });
+
 
         return { success: true, data };
     }

@@ -42,6 +42,7 @@ export class HomeworkSubmissionController {
                 cb(null, filename);
             },
         }),
+
         fileFilter: (req, file, cb) => {
             const allowed = ['pdf', 'doc', 'docx', 'zip', 'png', 'jpg', 'jpeg'];
             const ext = file.mimetype.split('/')[1];

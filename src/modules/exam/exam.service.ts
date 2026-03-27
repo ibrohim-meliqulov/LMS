@@ -6,16 +6,16 @@ import { UpdateExamDto } from './dto/update-exam.dto';
 
 @Injectable()
 export class ExamService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) { }
 
-    async create(dto: CreateExamDto, mentorId: number) {
+    async create(dto: CreateExamDto, mentorId: number, role: UserRole) {
         const section = await this.prisma.sectionLesson.findUnique({
             where: { id: dto.sectionId, status: Status.active },
             include: { course: true },
         });
         if (!section) throw new NotFoundException('Section not found');
 
-        if (section.course.mentorId !== mentorId) {
+        if (role !== UserRole.ADMIN && section.course.mentorId !== mentorId) {
             throw new ForbiddenException('This is not your course');
         }
 

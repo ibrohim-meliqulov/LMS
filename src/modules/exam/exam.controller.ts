@@ -18,7 +18,7 @@ export class ExamController {
     @Post()
     @Roles(UserRole.MENTOR, UserRole.ADMIN)
     create(@Body() dto: CreateExamDto, @Req() req: any) {
-        return this.examService.create(dto, req['user'].id);
+        return this.examService.create(dto, req['user'].id, req['user'].role);
     }
 
     @Get('section/:sectionId')

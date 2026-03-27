@@ -1,22 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateLessonDto {
-    @ApiProperty({ example: 1 })
-    @IsInt()
-    @Type(() => Number)
-    sectionId: number;
-
-    @ApiProperty({ example: 'JavaScript asoslari' })
+    @ApiProperty({ example: 'NestJS Introduction' })
     @IsString()
     name: string;
 
-    @ApiProperty({ example: 'Bu darsda JS asoslarini o\'rganamiz' })
+    @ApiProperty({ example: 'In this lesson we will learn NestJS basics' })
     @IsString()
     about: string;
 
-    @ApiProperty({ example: 'videos/lesson-1.mp4' })
-    @IsString()
-    video: string;
+    @ApiProperty({ example: 1 })
+    @IsNumber()
+    @Type(() => Number)
+    sectionId: number;
 }
